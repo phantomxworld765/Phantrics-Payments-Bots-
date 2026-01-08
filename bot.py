@@ -4,7 +4,7 @@ import os
 import time
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
-ADMIN_ID = os.environ.get('ADMIN_ID')
+ADMIN_ID = int(os.environ.get('ADMIN_ID'))
 
 bot = telebot.TeleBot(BOT_TOKEN)
 print("Bot Started!")
