@@ -1,7 +1,6 @@
 import telebot
 from telebot import types
 import os
-import time
 from flask import Flask
 import threading
 
@@ -24,44 +23,42 @@ def payment(m):
         bot.reply_to(m, "Please add payment details!")
         return
     
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("Approve", callback_data=f"approve_{m.message_id}"))
+    user_name = m.from_user.first_name
+    user_id = m.from_user.id
+    details = m.caption
     
-    bot.send_photo(
-        ADMIN_ID, 
-        m.photo[-1].file_id,
-        caption=f"💰 Payment Received
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("Approve", callback_data="approve"))
+    
+    msg = "Payment Received
 
-From: {m.from_user.first_name}
-User ID: {m.from_user.id}
+From: " + str(m.from_user.first_name) + "
+User ID: " + str(m.from_user.id) + "
 
 Details:
-{m.caption}",
-        reply_markup=markup
-    )
-    bot.reply_to(m, "Payment submitted! Waiting for approval...")
+" + m.caption
+    
+    bot.send_photo(ADMIN_ID, m.photo[-1].file_id, caption=msg, reply_markup=markup)
+    bot.reply_to(m, "Payment submitted!")
 
 # Flask app for Render
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Phantrics Payment Bot is Running!"
+    return "Bot Running"
 
 @app.route('/health')
 def health():
-    return "OK", 200
+    return "OK"
 
-# Run Flask in separate thread
 def run_flask():
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
 
-# Start Flask server
 flask_thread = threading.Thread(target=run_flask, daemon=True)
 flask_thread.start()
 
-print("Flask server started")
+print("Flask started")
 
-# Start bot polling
 bot.infinity_polling(timeout=60, long_polling_timeout=60)
