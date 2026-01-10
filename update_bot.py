@@ -18,10 +18,13 @@ def start(m):
     bot.send_message(m.chat.id, "Phantrics Payment Bot Active!")
 
 # Payment handler
-@bot.message_handler(content_types=['photo'])
 def payment(m):
-    if m.caption or len(m.caption.split(' ')) > 3:
+    if not m.caption or len(m.caption.split('
+')) < 3:
         bot.reply_to(m, "Need 3 lines!")
+        return
+    lines = m.caption.split('
+')
         return
     
     lines = m.caption.split('
